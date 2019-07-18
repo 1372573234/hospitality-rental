@@ -1,26 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react"
+import { BrowserRouter as Router, Route, Link } from "react-router-dom"
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import Home from "./pages/Home/index"
+import CityList from "./pages/CityList/index"
+import List from "./pages/List/index"
+
+export default class App extends React.Component{
+  render() {
+    return (
+      <Router>
+        <div>
+          <Link to="/home">首页</Link>
+          <Link to="/list">城市选择</Link>
+
+          <Route path="/home" component={Home}></Route>
+          <Route path="/list" component={CityList}></Route>
+
+          <Route path="/home/list" component={List}></Route>
+
+        </div>
+      </Router>
+    )
+  }
 }
-
-export default App;
