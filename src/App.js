@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom"
 
 import Home from "./pages/Home/index"
 import CityList from "./pages/CityList/index"
-import List from "./pages/List/index"
 
 export default class App extends React.Component{
   render() {
@@ -16,7 +15,7 @@ export default class App extends React.Component{
           <Route path="/home" component={Home}></Route>
           <Route path="/list" component={CityList}></Route>
 
-          <Route path="/home/list" component={List}></Route>
+          
 
         </div>
       </Router>
