@@ -109,7 +109,21 @@ class Index extends React.Component{
         >
           {this.renderSwipper()}
           </Carousel>)}
-         
+          <Flex className="search-box">
+            <Flex className="search">
+              <div className="location">
+                <span className="name">上海</span>
+                <i className="iconfont icon-arrow"></i>
+              </div>
+              <div className="form">
+                <i className="iconfont icon-seach"></i>
+                <span className="text">
+                  请输入小区地址
+                </span>
+              </div>
+            </Flex>
+            <i className="iconfont icon-map"></i>
+         </Flex>
         </div>
 
         {/*  */}
