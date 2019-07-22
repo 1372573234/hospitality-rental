@@ -1,0 +1,124 @@
+.nav{
+  .am-flexbox-item{
+    text-align:center;
+    padding: 10px 0;
+    img{
+      width:48px;
+      height: 48px;
+    }
+    p{
+      color: #666;
+      margin-top: 7px;
+    }
+  }
+}
+
+.groups{
+  background-color: #f6f5f6;
+  padding: 0 10px;
+  overflow: hidden;
+  &-title{
+    margin:15px 0px 15px 10px;
+    h3{
+      font-size: 15px;
+    }
+    span{
+      font-size: 14px;
+    }
+  }
+  .grid {
+      &-item {
+        padding: 0 13px;
+      }
+
+      .am-flexbox-item .am-grid-item-content {
+        padding: 8px 0;
+      }
+
+      .am-flexbox {
+        background-color: transparent;
+      }
+
+      .am-grid-item {
+        height: 85px;
+        margin-bottom: 10px;
+        background-color: #fff;
+      }
+
+      .am-grid-item:first-child {
+        margin-right: 10px;
+      }
+
+      .am-grid-item-content{
+        div{
+          padding: 0 15px;
+          .desc{
+            float: left;
+            margin-top: 15px;
+              p {
+              margin-bottom: 5px;
+              font-weight: bold;
+              font-size: 13px;
+            }
+            span {
+              font-size: 12px;
+              color: #999;
+            }
+          }
+           
+
+          img {
+            width: 55px;
+            margin-top: 5px;
+          }
+        }
+      }
+
+
+    }
+}
+
+.news{
+  padding:10px;
+  .news-title{
+    margin: 10px 0px 5px 10px;
+    color: #333;
+    h3{
+      font-size: 15px;
+    }
+  }
+  .news-item{
+    padding: 15px 10px 15px 0px;
+    clear: both;
+    border-bottom: 1px solid #e5e5e5;
+    .imgwrap{
+      float: left;
+      img{
+        width: 120px;
+      height: 90px;
+      }
+    }
+    .content{
+      padding-left: 12px;
+      align-items: center;
+      h3{
+        width: 100%;
+        margin-bottom: 15px;
+        font-size: 14px;
+        text-align: center;
+        color: #333;
+        // background-color: #f90;
+        
+      }
+      .info{
+        margin-top: 45px;
+        width: 100%;
+        // background-color: #f99;
+        span{
+          font-size: 12px;
+          color: #9C9FA1;
+        }
+      }
+    }
+  }
+}
