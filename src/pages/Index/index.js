@@ -14,7 +14,7 @@ import nav3 from "../../assets/images/nav-3.png"
 import nav4 from "../../assets/images/nav-4.png"
  
 
-
+const BMap = window.BMap
 
 class Index extends React.Component{
 
@@ -23,7 +23,8 @@ class Index extends React.Component{
     groups:[],
     data: [],
     imgHeight: 212,
-    isSwiperLoading:true
+    isSwiperLoading: true,
+    cityName:"上海"
   }
 
   async getSwipers() {
@@ -56,10 +57,24 @@ class Index extends React.Component{
     this.getSwipers()
     this.getGroups()
     this.getNews()
-    navigator.geolocation.getCurrentPosition(position => {
-      // postion 对象中，常用属性的文档：
-      // https://developer.mozilla.org/zh-CN/docs/Web/API/Coordinates
-      console.log('当前位置信息：', position)
+    // navigator.geolocation.getCurrentPosition(position => {
+    //   // postion 对象中，常用属性的文档：
+    //   // https://developer.mozilla.org/zh-CN/docs/Web/API/Coordinates
+    //   console.log('当前位置信息：', position)
+    // })
+    
+    const myCity = new BMap.LocalCity()
+      myCity.get(async (result) => {
+      const cityName = result.name
+      // console.log('当前定位城市名称为：', cityName)
+        const res = await axios.get("http://localhost:8080/area/info", {
+          params: {
+            name:cityName
+          }
+        })
+        const {label,value} = res.data.body
+        // console.log(label,value);
+        localStorage.setItem('hfzk_city',JSON.stringify({label,value}))
     })
   }
 
