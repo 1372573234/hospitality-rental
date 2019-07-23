@@ -45,7 +45,7 @@ class Index extends React.Component{
 
   async getNews() {
     const res = await axios.get("http://localhost:8080/home/news?area=AREA%7C88cff55c-aaa4-e2e0")
-    console.log(res);
+    // console.log(res);
     this.setState({
       news:res.data.body
     })
@@ -56,6 +56,11 @@ class Index extends React.Component{
     this.getSwipers()
     this.getGroups()
     this.getNews()
+    navigator.geolocation.getCurrentPosition(position => {
+      // postion 对象中，常用属性的文档：
+      // https://developer.mozilla.org/zh-CN/docs/Web/API/Coordinates
+      console.log('当前位置信息：', position)
+    })
   }
 
   renderSwipper() {
@@ -111,18 +116,20 @@ class Index extends React.Component{
           </Carousel>)}
           <Flex className="search-box">
             <Flex className="search">
-              <div className="location">
+              <div className="location"
+                onClick={() => this.props.history.push('/citylist')}
+              >
                 <span className="name">上海</span>
                 <i className="iconfont icon-arrow"></i>
               </div>
-              <div className="form">
+              <div className="form" onClick={() => this.props.history.push('/search')}>
                 <i className="iconfont icon-seach"></i>
                 <span className="text">
                   请输入小区地址
                 </span>
               </div>
             </Flex>
-            <i className="iconfont icon-map"></i>
+            <i className="iconfont icon-map" onClick={() => this.props.history.push('/map') }></i>
          </Flex>
         </div>
 
