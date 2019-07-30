@@ -17,8 +17,12 @@ html,body,#root,.app{
   height: 100%;
 }
 
-p,h3{
+p,h3,ul{
   margin: 0;
   padding: 0;
+}
+
+ul{
+  list-style: none;
 }
 

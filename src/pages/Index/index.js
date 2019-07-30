@@ -4,7 +4,8 @@ import { Carousel,Flex,Grid,WingBlank   } from 'antd-mobile';
 
 import { Link } from "react-router-dom";
 
-import axios from 'axios'
+// import axios from 'axios'
+import SearchHeader from '../../components/SearchHeader/index'
 
 import "./index.scss"
 
@@ -12,9 +13,10 @@ import nav1 from "../../assets/images/nav-1.png"
 import nav2 from "../../assets/images/nav-2.png"
 import nav3 from "../../assets/images/nav-3.png"
 import nav4 from "../../assets/images/nav-4.png"
+import { getCurrentCity,BASE_URL,API } from "../../utils";
  
 
-const BMap = window.BMap
+// const BMap = window.BMap
 
 class Index extends React.Component{
 
@@ -28,7 +30,7 @@ class Index extends React.Component{
   }
 
   async getSwipers() {
-    const res = await axios.get('http://localhost:8080/home/swiper')
+    const res = await API.get('/home/swiper')
     // console.log(res);
     this.setState({
       data:res.data.body,
@@ -37,7 +39,7 @@ class Index extends React.Component{
   }
 
   async getGroups() {
-    const res = await axios.get("http://localhost:8080/home/groups?area=AREA%7C88cff55c-aaa4-e2e0")
+    const res = await API.get("/home/groups?area=AREA%7C88cff55c-aaa4-e2e0")
     // console.log(res);
     this.setState({
       groups:res.data.body
@@ -45,37 +47,42 @@ class Index extends React.Component{
   }
 
   async getNews() {
-    const res = await axios.get("http://localhost:8080/home/news?area=AREA%7C88cff55c-aaa4-e2e0")
+    const res = await API.get("/home/news?area=AREA%7C88cff55c-aaa4-e2e0")
     // console.log(res);
     this.setState({
       news:res.data.body
     })
   }
 
-  componentDidMount() {
+  async componentDidMount() {
   // simulate img loading
     this.getSwipers()
     this.getGroups()
     this.getNews()
+
+    const { label } = await getCurrentCity()
+    this.setState({
+      cityName:label
+    })
     // navigator.geolocation.getCurrentPosition(position => {
     //   // postion 对象中，常用属性的文档：
     //   // https://developer.mozilla.org/zh-CN/docs/Web/API/Coordinates
     //   console.log('当前位置信息：', position)
     // })
     
-    const myCity = new BMap.LocalCity()
-      myCity.get(async (result) => {
-      const cityName = result.name
-      // console.log('当前定位城市名称为：', cityName)
-        const res = await axios.get("http://localhost:8080/area/info", {
-          params: {
-            name:cityName
-          }
-        })
-        const {label,value} = res.data.body
-        // console.log(label,value);
-        localStorage.setItem('hfzk_city',JSON.stringify({label,value}))
-    })
+    // const myCity = new BMap.LocalCity()
+    //   myCity.get(async (result) => {
+    //   const cityName = result.name
+    //   // console.log('当前定位城市名称为：', cityName)
+    //     const res = await axios.get("http://localhost:8080/area/info", {
+    //       params: {
+    //         name:cityName
+    //       }
+    //     })
+    //     const {label,value} = res.data.body
+    //     // console.log(label,value);
+    //     localStorage.setItem('hfzk_city',JSON.stringify({label,value}))
+    // })
   }
 
   renderSwipper() {
@@ -87,7 +94,7 @@ class Index extends React.Component{
               style={{ display: 'inline-block', width: '100%', height: this.state.imgHeight }}
             >
               <img
-                src={`http://localhost:8080${val.imgSrc}`}
+                src={`${BASE_URL}${val.imgSrc}`}
                 alt=""
                 style={{ width: '100%', verticalAlign: 'top' }}
                 onLoad={() => {
@@ -105,7 +112,7 @@ class Index extends React.Component{
     return this.state.news.map(item => (
       <div className='news-item' key={item.id}>
         <div className="imgwrap">
-          <img src={`http://localhost:8080${item.imgSrc}`} alt=""/>
+          <img src={`${BASE_URL}${item.imgSrc}`} alt=""/>
         </div>
         <Flex className="content" justify="between" direction="column" align="center">
           <h3>{item.title}</h3>
@@ -122,6 +129,7 @@ class Index extends React.Component{
     return (
       <div>
         <div className='swiper'>
+          {/* 轮播图 */}
           {this.state.isSwiperLoading ? null : (<Carousel
           autoplay={true}
           infinite
@@ -129,12 +137,14 @@ class Index extends React.Component{
         >
           {this.renderSwipper()}
           </Carousel>)}
-          <Flex className="search-box">
+          {/* 搜索栏 */}
+          <SearchHeader cityName={this.state.cityName}></SearchHeader>
+          {/* <Flex className="search-box">
             <Flex className="search">
               <div className="location"
                 onClick={() => this.props.history.push('/citylist')}
               >
-                <span className="name">上海</span>
+                <span className="name">{this.state.cityName}</span>
                 <i className="iconfont icon-arrow"></i>
               </div>
               <div className="form" onClick={() => this.props.history.push('/search')}>
@@ -145,10 +155,10 @@ class Index extends React.Component{
               </div>
             </Flex>
             <i className="iconfont icon-map" onClick={() => this.props.history.push('/map') }></i>
-         </Flex>
+         </Flex> */}
         </div>
 
-        {/*  */}
+        {/* 导航栏  */}
         <div className="nav">
             <Flex>
             <Flex.Item>
@@ -195,7 +205,7 @@ class Index extends React.Component{
                  <p>{el.title}</p>
                   <span>{el.desc}</span>
                 </div>
-                <img src={`http://localhost:8080${el.imgSrc}`} alt="" />
+                <img src={`${BASE_URL}${el.imgSrc}`} alt="" />
               </div>
             )}
           />

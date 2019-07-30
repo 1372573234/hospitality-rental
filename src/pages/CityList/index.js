@@ -1,12 +1,14 @@
 import React from "react"
 
-import { NavBar } from 'antd-mobile';
+import { Toast } from 'antd-mobile';
 
-import { List } from "react-virtualized"
+import { AutoSizer,List } from "react-virtualized"
 
 import axios from 'axios'
 
-import {getCurrentCity } from "../../utils/index"
+import {getCurrentCity,setCity } from "../../utils/index"
+
+import NavHeader from "../../components/NavHeader/index"
 
 import "./index.scss"
 
@@ -33,27 +35,30 @@ const formatCityList = list => {
   }
 }
 
-const list = Array.from(new Array(1000)).map((item, index) => `${index}----react-virtualized 组件列表项`)
-
-function rowRenderer({
-   key, // 每一项的唯一标识
-  index, // 每一行的索引号
-  isScrolling, // 表示当前行是否正在滚动，如果是滚动结果为true；否则，为false
-  isVisible, // 当前列表项是否可见
-  style // Style object to be applied to row (to position it)
-}) {
-  return (
-    <div key={key} style={style}>
-      {list[index]} --- {isScrolling+''}---{isVisible + ''}
-    </div>
-  )
+const formatCityIndex = letter => {
+  // console.log(letter);
+  switch (letter) {
+    case "#":
+      return "当前定位";
+    case "hot":
+      return "热门城市";
+    default:
+      return letter.toUpperCase()
+  }
 }
+
+const INDEX_HEIGHT = 36;
+const CITY_NAME_HEIGHT = 50;
+const CITY_HAS_HOUSE = ['北京','上海','广州','深圳']
 
 class CityList extends React.Component{
   state = {
     cityList: {},
-    cityIndex:[]
+    cityIndex: [],
+    activeIndex:0
   }
+
+  listRef = React.createRef()
   
   componentDidMount() {
     this.fetchCityList()
@@ -82,25 +87,100 @@ class CityList extends React.Component{
     })
   }
 
+  changeCity = ({ label,value }) => {
+    if (CITY_HAS_HOUSE.indexOf(label) > -1) {
+      setCity({ label, value })
+      this.props.history.go(-1)
+    } else {
+      Toast.info('该城市暂时无房源数据',1, null, false);
+   
+    }
+  }
+
+  rowRenderer = ({ key,index,style}) => {
+    const { cityList, cityIndex } = this.state
+    // console.log(cityList,cityIndex);
+    const letter = cityIndex[index]
+    const list = cityList[letter]
+    // console.log(letter, list);
+    return (
+      <div className="city" key={key} style={style}>
+        <div className="title">
+        {formatCityIndex(letter)}
+        </div>
+        {list.map(item => (
+          <div className="name"
+            key={item.value}
+            onClick= { () => this.changeCity(item) }
+          >
+            {item.label}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  calcRowHeight = ({ index}) => {
+    const { cityIndex,cityList } = this.state
+    const letter = cityIndex[index]
+    const list = cityList[letter]
+    return INDEX_HEIGHT + CITY_NAME_HEIGHT * list.length
+
+  }
+
+  goToCityIndex = index => {
+    return this.listRef.current.scrollToRow(index)
+  }
+
+  renderCityIndex() {
+    const { cityIndex, activeIndex } = this.state
+    return cityIndex.map((item,index) => (
+      <li className="city_index_item"
+        key={item}
+        onClick = { () => this.goToCityIndex(index)}
+      >
+        <span className={index === activeIndex ? 'index_active' : ""}>
+
+          {item === "hot" ? '热':item.toUpperCase()}
+        </span>
+      </li>
+    ))
+  }
+
+  onRowsRendered = ({ startIndex }) => {
+    // console.log(startIndex);
+
+    if (this.state.activeIndex !== startIndex) {
+      this.setState({
+        activeIndex:startIndex
+      })
+    }
+  }
 
   render() {
     return (
       <div className="citylist">
-        <NavBar
-          className="navbar"
-          mode="light"
-          icon={<i className="iconfont icon-back"></i>}
-          onLeftClick={() => console.log('onLeftClick')}
-        >
-          城市选择
-          </NavBar>
-         <List
-          width={375}
-          height={300}
-          rowCount={list.length}
-          rowHeight={20}
-          rowRenderer={rowRenderer}
-              />
+        <NavHeader>城市选择</NavHeader>
+        <AutoSizer>
+          {({ height, width }) => (
+            <List
+              ref = {this.listRef}
+              width={width}
+              height={height}
+              rowCount={this.state.cityIndex.length}
+              rowHeight={this.calcRowHeight}
+              rowRenderer={this.rowRenderer}
+              onRowsRendered = {this.onRowsRendered}
+              scrollToAlignment="start"
+            />
+          )}
+        </AutoSizer>
+
+        <ul className="city_index">
+          {this.renderCityIndex()}
+        </ul>
+        
+  
       </div>
     )
   }

@@ -1,6 +1,6 @@
 import axios from "axios"
 
-import { getCity,setCity } from "./city"
+import { getCity, setCity } from "./city"
 
 const BMap = window.BMap;
 
@@ -32,4 +32,6 @@ const getCurrentCity = () => {
   }
 }
 
-export { getCurrentCity}
+export { getCurrentCity, getCity, setCity }
+export { BASE_URL } from './url.js'
+export { API } from './api.js'
