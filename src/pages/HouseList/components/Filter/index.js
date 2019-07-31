@@ -6,11 +6,12 @@ import React, { Component } from 'react'
 
 import FilterTitle from '../FilterTitle'
 import FilterPicker from '../FilterPicker'
-// import FilterMore from '../FilterMore'
+import FilterMore from '../FilterMore'
 
 import { API,getCurrentCity } from "../../../../utils/index"
 
 import styles from './index.module.css'
+
 
 // 条件状态
 const titleSelectedStatus = {
@@ -44,24 +45,45 @@ export default class Filter extends Component {
   
   
   async getFilterData() {
-    const { value } =await getCurrentCity()
+    const { value } = await getCurrentCity()
     // console.log(value);
     const res = await API.get('/houses/condition', {
       params: {
-        id:value
+        id: value
       }
     })
     // console.log(res);
     this.setState({
-      filtersData:res.data.body
+      filtersData: res.data.body
     })
+  }
+
+  // 封装菜单高亮状态
+  getTitleSelectedStatus(type, selectVal) {
+    const newTitleSelectedStatus = {}
+    if (type === 'area' && (selectVal.length === 3 || selectVal[0] === 'subway')) {
+      // 有选中
+      newTitleSelectedStatus[type] = true
+    } else if (type === 'mode' && selectVal[0] !== 'null') {
+      // 有选中
+      newTitleSelectedStatus[type] = true
+    } else if (type === 'price' && selectVal[0] !== 'null') {
+      newTitleSelectedStatus[type] = true
+    } else if (type === 'more') { }
+      
+    else {
+      // 不选中
+      newTitleSelectedStatus[type] = false
+    }
+    
+    return newTitleSelectedStatus
   }
 
   // 切换标题高亮
   // 参数 type 表示：当前点击菜单的类型
   changeTitleSelected = type => {
-    const { titleSelectedStatus,selectedValues } = this.state
-    const newTitleSelectedStatus = {...titleSelectedStatus}
+    const { titleSelectedStatus, selectedValues } = this.state
+    const newTitleSelectedStatus = { ...titleSelectedStatus }
     // 对象无法直接遍历，需要用 forEach 
     //  Object.keys(titleSelectedStatus) => ['area','mode','price','more']  ----对象转成数组
     Object.keys(titleSelectedStatus).forEach(item => {
@@ -71,57 +93,35 @@ export default class Filter extends Component {
       if (item === type) {
         // 先判断是否为当前标题，如果是，直接让该标题选中状态为 true（高亮）
         newTitleSelectedStatus[type] = true
-      } else if (item === 'area' && (selectVal.length === 3 || selectVal[0] === 'subway')) {
-        // 有选中
-        newTitleSelectedStatus[item] = true
-      } else if (item === 'mode' && selectVal[0] !== 'null') {
-        // 有选中
-        newTitleSelectedStatus[item] = true
-      } else if (item === 'price' && selectVal[0] !== 'null') {
-        newTitleSelectedStatus[item] = true
-      } else if (item === 'more') { }
-      
-      else {
-        // 不选中
-        newTitleSelectedStatus[item] = false
+      } else {
+        const selected = this.getTitleSelectedStatus(item, selectVal)
+        // 将 selected 中的属性添加到  newTitleSelectedStatus 中，重名的属性后面的覆盖前面的
+        Object.assign(newTitleSelectedStatus, selected)
       }
-    })
     
-    // console.log(newTitleSelectedStatus);
+      // console.log(newTitleSelectedStatus);
 
-    this.setState({
-      // titleSelectedStatus: {
-      //   ...this.state.titleSelectedStatus,
-      //   [type] : true
-      // },
-      titleSelectedStatus:newTitleSelectedStatus,
-      openType:type
+      this.setState({
+        // titleSelectedStatus: {
+        //   ...this.state.titleSelectedStatus,
+        //   [type] : true
+        // },
+        titleSelectedStatus: newTitleSelectedStatus,
+        openType: type
+      })
     })
   }
 
+  // 取消按钮的事件
   onCancel = type => {
     // this.setState({
     //   openType:""
     // })
     const { titleSelectedStatus,selectedValues } = this.state
-    const newTitleSelectedStatus = { ...titleSelectedStatus }
     const selectVal = selectedValues[type]
     // 对象无法直接遍历，需要用 forEach 
     //  Object.keys(titleSelectedStatus) => ['area','mode','price','more']  ----对象转成数组
-     if (type === 'area' && (selectVal.length === 3 || selectVal[0] === 'subway')) {
-        // 有选中
-        newTitleSelectedStatus[type] = true
-      } else if (type === 'mode' && selectVal[0] !== 'null') {
-        // 有选中
-        newTitleSelectedStatus[type] = true
-      } else if (type === 'price' && selectVal[0] !== 'null') {
-        newTitleSelectedStatus[type] = true
-      } else if (type === 'more') { }
-      
-      else {
-        // 不选中
-        newTitleSelectedStatus[type] = false
-      }
+    const newTitleSelectedStatus =  this.getTitleSelectedStatus(type,selectVal)
   
     
     // console.log(newTitleSelectedStatus);
@@ -131,12 +131,13 @@ export default class Filter extends Component {
       //   ...this.state.titleSelectedStatus,
       //   [type] : true
       // },
-      titleSelectedStatus:newTitleSelectedStatus,
+      titleSelectedStatus:{...titleSelectedStatus,...newTitleSelectedStatus},
       openType: "",
       
     })
   }
 
+  // 保存按钮的事件
   onSave = (type, value) => {
     // 从 FilterPicker 中拿到数据
     // console.log('保存的数据', type, value);
@@ -151,23 +152,10 @@ export default class Filter extends Component {
     
     // 注意：此处不要依赖于状态中的选中值，而是应该依赖于传递过来的参数 value ,它才表示最新值
     const { titleSelectedStatus} = this.state
-    const newTitleSelectedStatus = {...titleSelectedStatus}
+    
     // 对象无法直接遍历，需要用 forEach 
     //  Object.keys(titleSelectedStatus) => ['area','mode','price','more']  ----对象转成数组
-     if (type === 'area' && (value.length === 3 || value[0] === 'subway')) {
-        // 有选中
-        newTitleSelectedStatus[type] = true
-      } else if (type === 'mode' && value[0] !== 'null') {
-        // 有选中
-        newTitleSelectedStatus[type] = true
-      } else if (type === 'price' && value[0] !== 'null') {
-        newTitleSelectedStatus[type] = true
-      } else if (type === 'more') { }
-      
-      else {
-        // 不选中
-        newTitleSelectedStatus[type] = false
-      }
+    const newTitleSelectedStatus = this.getTitleSelectedStatus(type,value)
   
     
     // console.log(newTitleSelectedStatus);
@@ -177,7 +165,7 @@ export default class Filter extends Component {
       //   ...this.state.titleSelectedStatus,
       //   [type] : true
       // },
-      titleSelectedStatus:newTitleSelectedStatus,
+      titleSelectedStatus:{...titleSelectedStatus,...newTitleSelectedStatus},
       openType: "",
       selectedValues: {
         ...this.state.selectedValues,
@@ -187,7 +175,8 @@ export default class Filter extends Component {
     
     // console.log(this.state);
   }
-
+ 
+  // 渲染 前面三个菜单对应的组件 
   renderFilterPicker() {
 
     const {
@@ -196,8 +185,8 @@ export default class Filter extends Component {
       selectedValues
     } = this.state
 
-     if(openType === 'more' || openType === '') {
-    return null
+    if(openType === 'more' || openType === '') {
+      return null
     }
     
     let data
@@ -210,11 +199,11 @@ export default class Filter extends Component {
         data = [area, subway]
         cols = 3
         break;
-     case 'mode':
-        data=rentType
+      case 'mode':
+        data = rentType
         break;
-     case 'price':
-        data=price
+      case 'price':
+        data = price
         break;
       default:
         break;
@@ -224,7 +213,7 @@ export default class Filter extends Component {
       <FilterPicker
         // react 会根据 key 是否相同，相同复用，不同则会删除新建
         key={openType}
-        data = {data}
+        data={data}
         cols={cols}
         onCancel={this.onCancel}
         onSave={this.onSave}
@@ -234,7 +223,20 @@ export default class Filter extends Component {
       />)
   }
 
- 
+  // 渲染 第四个菜单对应的组件
+  renderFilterMore() {
+    const {
+      openType,
+      filtersData:{roomType, oriented, floor, characteristic}
+    } = this.state
+
+    if (openType !== 'more') return null
+    
+    
+    const data = { roomType, oriented, floor, characteristic }
+  
+   return <FilterMore data={data} />
+  }
 
   render() {
     const { titleSelectedStatus, openType } = this.state
@@ -254,7 +256,7 @@ export default class Filter extends Component {
           {this.renderFilterPicker()}
          
           {/* 最后一个菜单对应的内容： */}
-          {/* <FilterMore /> */}
+          {this.renderFilterMore()}
         </div>
       </div>
     )
