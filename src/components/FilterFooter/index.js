@@ -4,7 +4,7 @@ import { Flex } from 'antd-mobile'
 
 import styles from './index.module.css'
 
-function FilterFooter({ style, className, onCancel, onSave }) {
+function FilterFooter({ style, className, onCancel, onSave, cancelText }) {
   return (
     <Flex style={style} className={[styles.root, className || ''].join(' ')}>
       {/* 取消按钮 */}
@@ -12,7 +12,7 @@ function FilterFooter({ style, className, onCancel, onSave }) {
         className={[styles.btn, styles.cancel].join(' ')}
         onClick={onCancel}
       >
-        取消
+        {cancelText}
       </span>
 
       {/* 确定按钮 */}
@@ -21,6 +21,10 @@ function FilterFooter({ style, className, onCancel, onSave }) {
       </span>
     </Flex>
   )
+}
+
+FilterFooter.defaultProps = {
+  cancelText:"取消"
 }
 
 export default FilterFooter

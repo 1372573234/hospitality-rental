@@ -41,6 +41,7 @@ export default class Filter extends Component {
 
   componentDidMount() {
     this.getFilterData()
+    this.htmlBody = document.body
   }
   
   
@@ -69,7 +70,9 @@ export default class Filter extends Component {
       newTitleSelectedStatus[type] = true
     } else if (type === 'price' && selectVal[0] !== 'null') {
       newTitleSelectedStatus[type] = true
-    } else if (type === 'more') { }
+    } else if (type === 'more' && selectVal.length > 0) {
+       newTitleSelectedStatus[type] = true
+     }
       
     else {
       // 不选中
@@ -82,6 +85,8 @@ export default class Filter extends Component {
   // 切换标题高亮
   // 参数 type 表示：当前点击菜单的类型
   changeTitleSelected = type => {
+    this.htmlBody.className = 'hidden'
+
     const { titleSelectedStatus, selectedValues } = this.state
     const newTitleSelectedStatus = { ...titleSelectedStatus }
     // 对象无法直接遍历，需要用 forEach 
@@ -117,6 +122,8 @@ export default class Filter extends Component {
     // this.setState({
     //   openType:""
     // })
+    this.htmlBody.className = ''
+
     const { titleSelectedStatus,selectedValues } = this.state
     const selectVal = selectedValues[type]
     // 对象无法直接遍历，需要用 forEach 
@@ -131,9 +138,8 @@ export default class Filter extends Component {
       //   ...this.state.titleSelectedStatus,
       //   [type] : true
       // },
-      titleSelectedStatus:{...titleSelectedStatus,...newTitleSelectedStatus},
       openType: "",
-      
+      titleSelectedStatus:{...titleSelectedStatus,...newTitleSelectedStatus},
     })
   }
 
@@ -151,14 +157,48 @@ export default class Filter extends Component {
     //  })
     
     // 注意：此处不要依赖于状态中的选中值，而是应该依赖于传递过来的参数 value ,它才表示最新值
-    const { titleSelectedStatus} = this.state
+    // console.log(type,value);
+    const { titleSelectedStatus,selectedValues} = this.state
     
     // 对象无法直接遍历，需要用 forEach 
     //  Object.keys(titleSelectedStatus) => ['area','mode','price','more']  ----对象转成数组
     const newTitleSelectedStatus = this.getTitleSelectedStatus(type,value)
   
-    
+    const newSelectedValues = {
+      ...selectedValues,
+      [type]:value
+    }
     // console.log(newTitleSelectedStatus);
+     // 这是传递给父组件的筛选条件对象
+    const filters = {}
+
+    // console.log(key)
+    // 处理：区域或地铁
+    // area -> ["area", "null"] 或 ["subway", "null"]
+    const area = newSelectedValues.area
+    const areaKey = area[0]
+    let areaValue
+    // 如果数组长度为 2 ，就为：null
+    // 如果数组长度为 3 ，先判断最后一项是否为 null ，如果是，就拿倒数第二项
+    //                                             否则，就获取最后一项的值
+    if (area.length === 2) {
+      areaValue = 'null'
+    } else if (area.length === 3) {
+      areaValue = area[2] === 'null' ? area[1] : area[2]
+    }
+    // 添加到对象中
+    filters[areaKey] = areaValue
+
+    // 处理方式和租金
+    filters.rentType = newSelectedValues.mode[0]
+    filters.price = newSelectedValues.price[0]
+
+    // 处理更多筛选条件数据
+    filters.more = newSelectedValues.more.join(',')
+
+    this.props.onFilter(filters)
+
+    // console.log('最新筛选条件为：', newSelectedValues, filters)
 
     this.setState({
       // titleSelectedStatus: {
@@ -167,10 +207,7 @@ export default class Filter extends Component {
       // },
       titleSelectedStatus:{...titleSelectedStatus,...newTitleSelectedStatus},
       openType: "",
-      selectedValues: {
-        ...this.state.selectedValues,
-        [type]:value
-      }
+      selectedValues:newSelectedValues
     })
     
     // console.log(this.state);
@@ -178,40 +215,43 @@ export default class Filter extends Component {
  
   // 渲染 前面三个菜单对应的组件 
   renderFilterPicker() {
-
     const {
       openType,
-      filtersData: { area, price, rentType, subway },
+      filtersData: { area, subway, rentType, price },
       selectedValues
     } = this.state
 
-    if(openType === 'more' || openType === '') {
+    if (openType === 'more' || openType === '') {
       return null
     }
-    
-    let data
-    let cols = 1
 
+    // 从 filtersData 中获取数据
+    // area： area => {}, subway => {}
+    // mode： rentType => []
+    // price：price => []
+    let data
+    // 列数
+    let cols = 1
+    // 当前选中值
     let defaultValue = selectedValues[openType]
 
     switch (openType) {
       case 'area':
         data = [area, subway]
         cols = 3
-        break;
+        break
       case 'mode':
         data = rentType
-        break;
+        break
       case 'price':
         data = price
-        break;
+        break
       default:
-        break;
+        break
     }
 
     return (
       <FilterPicker
-        // react 会根据 key 是否相同，相同复用，不同则会删除新建
         key={openType}
         data={data}
         cols={cols}
@@ -219,23 +259,25 @@ export default class Filter extends Component {
         onSave={this.onSave}
         type={openType}
         defaultValue={defaultValue}
-       
-      />)
+      />
+    )
   }
-
   // 渲染 第四个菜单对应的组件
   renderFilterMore() {
     const {
       openType,
-      filtersData:{roomType, oriented, floor, characteristic}
+      filtersData: { roomType, oriented, floor, characteristic },
+      selectedValues
     } = this.state
 
     if (openType !== 'more') return null
     
     
     const data = { roomType, oriented, floor, characteristic }
+
+    const defaultValue = selectedValues.more
   
-   return <FilterMore data={data} />
+   return <FilterMore data={data} selectedValues={selectedValues} onSave={this.onSave} type={openType} onCancel = {this.onCancel}  defaultValue={defaultValue} />
   }
 
   render() {

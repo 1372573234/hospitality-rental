@@ -65,6 +65,7 @@ class CityList extends React.Component{
   }
 
   async fetchCityList() {
+    Toast.loading('加载中...', 0, false, null)
     const res = await axios.get("http://localhost:8080/area/city?level=1")
     // console.log(res);
 
@@ -77,7 +78,7 @@ class CityList extends React.Component{
     cityList['hot'] = hotRes.data.body
 
     // console.log(cityIndex,cityList);
-
+    Toast.hide()
     const curCity = await getCurrentCity()
     cityIndex.unshift('#')
     cityList['#'] = [curCity]
