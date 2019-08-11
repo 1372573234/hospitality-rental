@@ -180,7 +180,7 @@ class Index extends React.Component{
               </Link>
               </Flex.Item>
             <Flex.Item>
-              <Link to="/home/list">
+              <Link to="/rent/add">
                 <img src={nav4} alt="" />
                 <p>去出租</p>
               </Link>

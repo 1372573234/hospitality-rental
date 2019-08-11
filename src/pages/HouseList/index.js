@@ -60,7 +60,7 @@ export default class HouseList extends React.Component {
       }
     })
     Toast.hide()
-    console.log('获取到的数据',res);
+    // console.log('获取到的数据',res);
     const { list, count } = res.data.body
     
     if (count > 0) {

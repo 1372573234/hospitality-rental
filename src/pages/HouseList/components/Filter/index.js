@@ -3,6 +3,8 @@
 */
 import React, { Component } from 'react'
 
+import {Spring} from 'react-spring/renderprops'
+
 
 import FilterTitle from '../FilterTitle'
 import FilterPicker from '../FilterPicker'
@@ -280,13 +282,41 @@ export default class Filter extends Component {
    return <FilterMore data={data} selectedValues={selectedValues} onSave={this.onSave} type={openType} onCancel = {this.onCancel}  defaultValue={defaultValue} />
   }
 
+  // 渲染遮罩层元素
+  renderMask() {
+    const { openType } = this.state
+
+    const isHide = openType === 'open' || openType === ''
+
+    return (
+      <Spring
+        from={{ opacity: 0 }}
+        to={{ opacity: isHide ? 0:1 }}>
+        {props => {
+          if (props.opacity === 0) {
+            return null
+          }
+
+          return (
+            <div
+              style={props}
+              className={styles.mask} onClick={() => this.onCancel(openType)}>
+            </div>)
+            }
+        }
+      </Spring>
+    )
+  }
+
   render() {
-    const { titleSelectedStatus, openType } = this.state
+    const { titleSelectedStatus } = this.state
 
     return (
       <div className={styles.root}>
         {/* 前三个菜单的遮罩层 */}
-        { openType === 'area' || openType === 'mode' || openType === 'price' ? (<div className={styles.mask} onClick={this.onCancel} />) : null }
+        {this.renderMask()}
+
+
         <div className={styles.content}>
           {/* 标题栏 */}
           <FilterTitle

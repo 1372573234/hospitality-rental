@@ -35,3 +35,5 @@ const getCurrentCity = () => {
 export { getCurrentCity, getCity, setCity }
 export { BASE_URL } from './url.js'
 export { API } from './api.js'
+
+export { getToken,setToken,removeToken,isAuth } from "./token.js"

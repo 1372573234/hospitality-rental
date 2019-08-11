@@ -1,7 +1,9 @@
 import React from "react"
 import ReactDOM from "react-dom"
 
-import 'antd-mobile/dist/antd-mobile.css'
+// import 'antd-mobile/dist/antd-mobile.css'
+
+import 'react-virtualized/styles.css'
 
 // 导入字体图标库的样式
 import './assets/fonts/iconfont.css'
